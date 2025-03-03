@@ -1,0 +1,124 @@
+ create table ACCTMASTER(accno INT primary key,name char(25),balance number(10)); 
+
+ create table ACCTTRAN(accno INT references ACCTMASTER(accno),tran_date date default sysdate,deb_cred char(7),flag char(2) default 'N',amount number(10));
+
+  insert into ACCTMASTER values(&accno,'&name',&balance); 
+
+  insert into ACCTTRAN values(&accno,'&tran_date','&deb_cred','&flag',&amt);
+
+
+
+
+
+  declare 
+no INT; 
+bal number(10); 
+trdate date; 
+dc char(7); 
+a number(10); 
+fl char(2); 
+cursor ctrn is select * from ACCTTRAN where flag='n' or flag='N'; 
+begin 
+open ctrn; 
+loop 
+fetch ctrn into no,trdate,dc,fl,a; 
+if ctrn%found then 
+if dc='debit' then 
+update ACCTMASTER set balance=balance-a where accno=no; 
+update ACCTTRAN set flag='Y' where accno=no; 
+elsif dc='credit' then 
+update ACCTMASTER set balance=balance+a where accno=no; 
+update ACCTTRAN set flag='Y' where accno=no; 
+end if; 
+else 
+exit; 
+end if; 
+end loop; 
+commit; 
+close ctrn; 
+end; 
+/
+
+
+
+
+
+
+
+
+
+
+
+SQL > 
+Enter value for accno : 101 
+Enter value for name :Tharun 
+Enter value for balance : 10000 
+SQL >  / 
+Enter value for accno : 102 
+Enter value for name :Thilak 
+Enter value for balance : 19000 
+SQL >select * from ACCTMASTER 
+Acc No 
+101 
+BALANCE 
+NAME 
+Tharun 
+102` 
+10000 
+Thilak 
+19000 
+SQL >  / 
+Enter value for accno : 101 
+Enter value fortran_date : 05-JAN-18 
+Enter value for  ded_cred : Debit 
+Enter value for flag : n 
+Enter value for amt : 1000 
+SQL >  / 
+Enter value for accno : 102 
+Enter value fortran_date : 05-JAN-18 
+Enter value for  ded_cred : Credit 
+Enter value for flag : n 
+Enter value for amt : 1000 
+SQL >select * from ACCTTRAN ; 
+ACCNO 
+TRAN_DATE DEB_CRE 
+FL 
+101 
+AMOUNT 
+05-JAN-18 
+Debit 
+N 
+102 
+05-JAN-18 
+credit 
+1000 
+N 
+1000 
+SQL > / 
+PL\SQL procedure successfully Completed. 
+SQL >select * from ACCTMASTER 
+Acc No 
+NAME 
+101 
+Tharun 
+BALANCE 
+102` 
+9000 
+Thilak 
+20000 
+SQL >select * from ACCTTRAN ; 
+ACCNO 
+TRAN_DATE DEB_CRE 
+FL 
+101 
+AMOUNT 
+05-JAN-18 
+Debit 
+y 
+102 
+05-JAN-18 
+credit 
+1000 
+y 
+RESULT: 
+1000
