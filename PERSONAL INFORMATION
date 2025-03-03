@@ -1,0 +1,82 @@
+Create table  student(rollnoINT,name char(25),tot_marks number(10),trade char(25)); 
+Create  table IT(rollnoINT,name char(25),tot_marks number(10),trade char(25),rank number(3)); 
+Create table CS(rollnoINT,name char(254),TOT_marks number(10),trade char(25),rank number(3));
+
+
+
+
+
+declare 
+rno number(38); 
+name char(25); 
+tot number(10); 
+trd char(25); 
+rnk number(3); 
+mx number(10); 
+cursor curr is select * from student; 
+cursor cit is select * from IT; 
+cursor css is select * from CS; 
+I number(4); 
+begin 
+delete from IT; 
+delete from CS; 
+open curr; 
+loop  
+fetch curr into rno,name,tot,trd; 
+if(curr%found) then 
+if trd='IT' then 
+insert into IT values (rno,name,tot,trd,rnk); 
+elsif  trd='CS' then 
+insert into CS values(rno,name,tot,trd,rnk); 
+end if; 
+else 
+exit; 
+end if; 
+end loop; 
+commit; 
+close curr; 
+i:=1; 
+update CS set rank=null; 
+open css; 
+
+loop 
+fetch css into rno,name,tot,trd,rnk; 
+if(css%found) then 
+select max(tot_marks) into mx from CS where rank is null; 
+update CS set rank=i where tot_marks=mx; 
+i:=i+1; 
+else 
+exit; 
+end if; 
+end loop; 
+commit; 
+close css; 
+i:=1; 
+update IT set rank=null; 
+open cit; 
+loop 
+fetch cit into rno,name,tot,trd,rnk; 
+if(cit%found) then 
+select max(tot_marks) into mx from IT where rank is null; 
+update IT  set rank=i where tot_marks=mx; 
+i:=i+1; 
+else 
+exit; 
+end if; 
+end loop; 
+commit; 
+close cit; 
+end; 
+/ 
+ 
+
+
+
+
+
+
+
+
+
+
+
