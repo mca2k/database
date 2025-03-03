@@ -1,0 +1,157 @@
+SQL> create table train_details(train_name char(15) primary key,total_seats
+  2  number(3),reserved_seats number(3));
+
+Table created.
+
+SQL>
+SQL> create table reservation_status(train_name char(15) references
+  2  train_details(train_name),seat_id number(3),reserved char(2) check (reserved
+  3  in('y','n')),customer_name char(15));
+
+Table created.
+
+SQL>
+SQL> create table waiting_list(slno number(3),customer_name char(15) primary key,train_name
+  2  char(15) references train_details(train_name));
+
+
+
+DECLARE
+  tname VARCHAR2(15);
+  tot NUMBER(3);
+  resv NUMBER(3);
+  CURSOR cur IS SELECT train_name, total_seats, reserved_seats FROM train_details;
+BEGIN
+  INSERT INTO train_details (train_name, total_seats, reserved_seats) VALUES ('&train_name', &total_seats, 0);
+
+  OPEN cur;
+  LOOP
+    FETCH cur INTO tname, tot, resv;
+    EXIT WHEN cur%NOTFOUND; -- Exit when no more rows are found
+
+    FOR i IN 1..tot LOOP
+      INSERT INTO reservation_status (train_name, seat_id, reserved, customer_name) VALUES (tname, i, 'n', NULL);
+    END LOOP;
+  END LOOP;
+  CLOSE cur;
+  COMMIT;
+END;
+/
+
+
+ 
+
+
+DECLARE
+    Cname CHAR(15);
+    Tname CHAR(15);
+    tot NUMBER(3);
+    resv NUMBER(3);
+    sid NUMBER(3);
+    sno NUMBER(3);
+    sl NUMBER(3);
+BEGIN
+    -- Prompt for customer name and train name
+    Cname := '&cname';  -- Do not enclose the input in single quotes
+    Tname := '&tname';  -- Do not enclose the input in single quotes
+
+    -- Get total seats and reserved seats
+    SELECT total_seats, reserved_seats INTO tot, resv
+    FROM train_details
+    WHERE train_name = Tname;
+
+    IF tot > resv THEN
+        -- Find the first available seat
+        SELECT MIN(seat_id) INTO sid
+        FROM reservation_status
+        WHERE train_name = Tname AND reserved = 'n';
+
+        -- Update reservation status
+        UPDATE reservation_status
+        SET reserved = 'y', customer_name = Cname
+        WHERE train_name = Tname AND seat_id = sid;
+
+        -- Increment reserved seats count
+        UPDATE train_details
+        SET reserved_seats = reserved_seats + 1
+        WHERE train_name = Tname;
+    ELSE
+        -- Add to waiting list
+        SELECT NVL(MAX(slno), 0) + 1 INTO sl
+        FROM waiting_list;
+
+        INSERT INTO waiting_list VALUES (sl, Cname, Tname);
+    END IF;
+
+    COMMIT;
+END;
+/
+
+
+
+
+
+DECLARE
+    Cname CHAR(15);
+    Tname CHAR(15);
+    sid NUMBER(3);
+    sno NUMBER(3);
+    sl NUMBER(3);
+BEGIN
+    Cname := '&cname';
+    Tname := '&tname';
+
+    BEGIN
+        -- Get the seat ID for the customer
+        SELECT seat_id INTO sid
+        FROM reservation_status
+        WHERE train_name = Tname AND customer_name = Cname;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('No reservation found for customer ' || Cname || ' on train ' || Tname);
+            RETURN; -- Exit the procedure if no reservation is found
+    END;
+
+    -- Check if there is anyone on the waiting list
+    BEGIN
+        SELECT MIN(slno) INTO sno
+        FROM waiting_list
+        WHERE train_name = Tname;
+
+        IF sno IS NOT NULL THEN
+            -- Assign the seat to the next customer on the waiting list
+            SELECT customer_name INTO Cname
+            FROM waiting_list
+            WHERE train_name = Tname AND slno = sno;
+
+            UPDATE reservation_status
+            SET customer_name = Cname
+            WHERE train_name = Tname AND seat_id = sid;
+
+            DELETE FROM waiting_list
+            WHERE train_name = Tname AND slno = sno;
+        ELSE
+            -- Free the seat
+            UPDATE reservation_status
+            SET reserved = 'n', customer_name = NULL
+            WHERE train_name = Tname AND seat_id = sid;
+
+            UPDATE train_details
+            SET reserved_seats = reserved_seats - 1
+            WHERE train_name = Tname;
+        END IF;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            -- No one on the waiting list, free the seat
+            UPDATE reservation_status
+            SET reserved = 'n', customer_name = NULL
+            WHERE train_name = Tname AND seat_id = sid;
+
+            UPDATE train_details
+            SET reserved_seats = reserved_seats - 1
+            WHERE train_name = Tname;
+    END;
+
+    COMMIT;
+END;
+/
