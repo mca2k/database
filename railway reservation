@@ -155,3 +155,124 @@ BEGIN
     COMMIT;
 END;
 /
+
+
+
+
+
+
+
+
+
+
+
+
+
+SQL >/ 
+Enter value for Train-Name: Nellai Express 
+Enter value for Total-Seats: 3 
+PL\SQL procedure successfully Completed. 
+SQL >/ 
+Enter value for Train-Name: Chennai Express 
+Enter value for Total-Scats: 3 
+PL\SQL procedure successfully Completed. 
+SQL > select * from Train_Details; 
+Train-Name 
+Total-Seats 
+Nellai Express 
+Reserved-Seats 
+3 
+Chennai Express 
+0 
+3 
+SQL > select * from reservation_status; 
+Train-name 
+Seat-ID 
+0 
+RB 
+Nellai Express 
+Passenger_name 
+1 
+n  
+Nellai Express 
+2 
+n  
+Nellai Express 
+3 
+n  
+Chennai Express 
+1 
+n  
+Chennai Express 
+2 
+n  
+SQL > / 
+Enter value for PName: ‘Ravi’ 
+Enter value for tname: Nellai Express 
+PL\SQL procedure successfully Completed. 
+SQL > / 
+Enter value for PName: ‘Karthi’ 
+Enter value for tname: Chennai Express 
+PL\SQL procedure successfully Completed. 
+SQL > / 
+Enter value for PName: ‘Arun’ 
+Enter value for tname: Chennai Express 
+ 
+ 
+ 
+ 
+PL\SQL procedure successfully Completed. 
+ 
+SQL > / 
+Enter value for PName: ‘Tharika’ 
+Enter value for tname: Chennai Express 
+PL\SQL procedure successfully Completed. 
+ 
+ 
+ 
+ 
+SQL > select * from reservation_status; 
+Train-name Seat-ID RB Passenger_name 
+Nellai Express 1 y Ravi 
+Nellai Express 2 n  
+Nellai Express 3 n  
+Chennai Express 1 y Karthi 
+Chennai Express 2 y Arun 
+ 
+ 
+SQL > select * from wating_list; 
+S.NO Passenger_name Train_name 
+1 Tharika Chennai Express 
+ 
+ 
+ 
+SQL > / 
+Enter value for CName: ‘appu’ 
+Enter value for tname:BB 
+PL\SQL procedure successfully Completed. 
+ 
+ 
+SQL > select * from reservation_status; 
+Train-name Seat-ID RB Passenger_name 
+Nellai Express 1 y Ravi 
+Nellai Express 2 n  
+Nellai Express 3 n  
+Chennai Express 1 y Karthi 
+Chennai Express 2 y Arun 
+ 
+5 rows selected 
+SQL > select * from wating_list; 
+S.NO 
+Passenger_name 
+Train_name 
+SQL > select * from Train_Details; 
+Train-Name 
+Total-Seats 
+Nellai Express 
+Reserved-Seats 
+3 
+Chennai Express 
+1 
+2 
+Result:
+ 2
