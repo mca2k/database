@@ -1,0 +1,82 @@
+create table per_rec(rollno number(30) primary key,name varchar2(15), age number(2),sex char(2), address varchar2(20), father varchar2(20)); 
+create table col_rec1(rollno number(5), reg_no number(10),name varchar2(20),branch varchar2(30) not null,year number(1),semester number(1)); 
+create table marklist(reg_no number(10),mark1 number(3),mark2 number(3),mark3 number(3),mark4 number(3), mark5 number(3),mark6 number(3)); 
+create table result(reg_no number(10), percentage number(6,2),result varchar2(20), arrears number(2)); 
+
+
+
+
+
+
+
+declare 
+rollno number(30); 
+reg_no number(30); 
+name varchar2(15); 
+branch varchar2(30); 
+year number; 
+semester number(5); 
+mark1 number(3); 
+mark2 number(3); 
+mark3 number(3); 
+mark4 number(3); 
+mark5 number(3); 
+mark6 number(3); 
+age number(2); 
+sex char(2); 
+address varchar2(15); 
+father varchar2(15); 
+result varchar2(15); 
+percentage number(6,2); 
+arrears number(2); 
+begin 
+arrears:=0; 
+rollno:=&rollno; 
+reg_no:=&reg_no; 
+name:='&name'; 
+branch:='&branch'; 
+mark1:=&mark1; 
+mark2:=&mark2; 
+mark3:=&mark3; 
+mark4:=&mark4; 
+mark5:=&mark5; 
+mark6:=&mark6; 
+if(mark1<50) then 
+arrears:=arrears+1; 
+end if; 
+if(mark2<50) then 
+arrears:=arrears+1; 
+end if; 
+if(mark3<50) then 
+arrears:=arrears+1; 
+end if; 
+if(mark4<50) then 
+arrears:=arrears+1; 
+end if; 
+if(mark5<50) then 
+arrears:=arrears+1; 
+end if; 
+if(mark6<50) then 
+arrears:=arrears+1; 
+end if; 
+percentage:=(mark1+mark2+mark3+mark4+mark5+mark6); 
+percentage:=percentage/6; 
+if(percentage>75)then 
+result:='distinction'; 
+elsif(percentage>60)then 
+result:='1st class'; 
+elsif(percentage>50)then 
+result:='2nd class'; 
+end if; 
+if(arrears!=0) then 
+result:='fail'; 
+end if; 
+insert into per_rec values(rollno,name,&age,'&sex','&address','&father'); 
+insert into col_rec1 values(rollno,reg_no,name,branch,&year,&semester); 
+insert into marklist values(reg_no,mark1,mark2,mark3,mark4,mark5,mark6); 
+insert into result values(reg_no,percentage,result,arrears);
+end;
+/
+
+
+
